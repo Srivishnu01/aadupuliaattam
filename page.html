@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+  padding: 10px;
+  height: 800px; 
+}
+
+.left {
+  width: 25%;
+}
+
+.right {
+  width: 75%;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+
+</head>
+<body style="background-color: #9c7">
+
+<h1><center >
+நிரல்களம்'21 :: ஆடு-புலி ஆட்டம்
+</center></h1>
+
+<div class="row">
+  <div class="column left" style="background-color:#dbe;">
+  	 <h2><center><u>விளையாட்டு தகவல்கள்</u></center></h2>
+    <h3><center>
+        	<p id="goatcount">
+    		ஆடுகள் மீதி : 15
+    	</p>
+    	<p id="tigercount">
+    		புலிகள் மீதி :  3
+    	</p>
+    	<p id="goatdead">
+    		கொல்லப்பட்ட ஆடுகள் : 0
+    	</p>
+    	<p id="tigerdead">
+    		அடக்கப்பட்ட புலிகள் : 0
+    	</p>
+    	<p><h4><b>______________________________________</b><br>5 ஆடுகள் கொல்லப்பட்டால் புலி வெற்றி**<br>
+    		3 புலியையும் அடக்கினால் ஆடு வெற்றி**
+    	</h4>
+    	</p>
+    	__________________________________________<br>
+    	<p id='gameturn'>ஆடு விளையாடுக</p>
+    	__________________________________________<br><br>
+    	<button id="newgame">புதிய விளையாட்டு</button>
+<p id='checkOut' style="color: red"></p>
+</center>
+    </h3>
+
+   
+  </div>
+  <div class="column right" style="background-color:#b3ffe0;">
+   
+    <p></p>
+<center>
+<canvas id="gameBoard" width="1100" height="640"
+style="border:0px solid #000000;">
+</canvas>
+<script type="text/javascript">;
+</script>
+</center>
+
+  </div>
+</div>
+<script type="text/javascript">
+	var canvas = document.getElementById('gameBoard');
+	document.getElementById('newgame').onclick=initAll;
+	var ctx = canvas.getContext('2d');
+	var pts,alloc,selected=-1,remaining=[3,15],player=0,gdead=0;
+	const nears=[
+	[11,13,14,12],
+	[19,3],
+	[4,20],
+	[1,4,21],
+	[3,2,22],
+	[7,11],
+	[12,8],
+	[5,9,15],
+	[16,6,10],
+	[7,19],
+	[20,8],
+	[0,5,13,15],
+	[0,14,6,16],
+	[11,14,0,17],
+	[0,13,12,18],
+	[7,11,17,19],
+	[12,18,8,20],
+	[15,18,13,21],
+	[17,16,14,22],
+	[9,15,21,1],
+	[2,16,22,10],
+	[22,19,17,3],
+	[18,4,21,20]
+	]
+	const captures=[
+	[15,17,18,16],
+	[15,4],
+	[16,3],
+	[2,17],
+	[1,18],
+	[9,13],
+	[14,10],
+	[17],
+	[18],
+	[21,5],
+	[22,6],
+	[14,19],
+	[20,13],
+	[12,5,21],
+	[11,6,22],
+	[18,1,0],
+	[17,0,2],
+	[16,7,0,3],
+	[0,15,8,4],
+	[22,11],
+	[21,12],
+	[20,9,13],
+	[19,10,14]
+	];
+
+	function initAll() {
+		
+		alloc=new Array(23).fill(0);
+		selected=-1,remaining=[3,15],player^=1,gdead=0;
+		refresh();
+	//	document.getElementById('checkOut').innerText=alloc.toString();
+	}
+	function Validate(player,dest,sour)
+	{
+		if(alloc[dest])
+			return 0;
+		if(alloc[sour]!=player+1)
+			return 0;
+		var i=nears[dest].indexOf(sour);
+		if(i==-1)
+		{
+			if(player)
+				return 0;
+			i=captures[dest].indexOf(sour);
+			if(i==-1)
+			{
+				return 0;
+			}
+			for(x of nears[dest])
+			{
+			  for(y of nears[sour])
+			  {
+			  	if(x==y && x)
+			  	{
+			  		if(alloc[x]!=2)
+			  			return 0;
+	//		  document.getElementById('checkOut').innerText="inside9-";
+			  		//capture logic
+			  		alloc[x]=0;
+			  		gdead++;
+	//		document.getElementById('checkOut').innerText+=x;
+			  		alloc[sour]=0;
+			  		alloc[dest]=1;
+			  		return 1;
+			  	}
+			  }
+			}
+			return 0;
+		}
+		
+		//move logic
+		alloc[sour]=0;
+		alloc[dest]=player+1;
+			return 1;
+		
+	}
+	function calctiger()
+	{
+		var al=0,tdead=0;
+		for(;al<23;al++)
+		{
+			if(alloc[al]==1)
+			{
+				var conti=false;
+				for(nr of nears[al])
+				{
+					if(alloc[nr]==0)
+					{
+						conti=true;
+						break;
+					}
+				}
+				if(conti)continue;
+				for(cr of captures[al])
+				{
+					if(alloc[cr]==0)
+					{
+						for(x of nears[cr])
+					{
+					  for(y of nears[al])
+					  {
+					  	if(x==y && x && alloc[x]==2)
+					  	{
+					  		conti=true;
+					  		break;
+					  	}
+						
+						}if(conti)break;
+			}if(conti)break;
+		}
+	}if(conti)continue;
+	tdead++;
+}	
+
+
+}
+	return tdead;
+}
+	function refresh()
+	{
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		draw();
+		var jc=0;
+		var i=0;
+		for(;i<23;i++)
+		{
+			if(alloc[i]>0)
+			{
+				let p=pts[i];
+//	document.getElementById('checkOut').innerText+=(jc++);
+				drawTiger(p[0],p[1],alloc[i]);
+			}
+		}
+		//document.getElementById('checkOut').innerText="";
+		document.getElementById('tigercount').innerText="புலிகள் மீதி : "+remaining[0];
+		document.getElementById('goatcount').innerText="ஆடுகள் மீதி : "+remaining[1];
+		var ele=document.getElementById('gameturn');
+		ele.innerText=player?'ஆடு விளையாடுக':'புலி விளையாடுக';
+		ele.style.color=player?'blue':'green';
+		document.getElementById('goatdead').innerText="கொல்லப்பட்ட ஆடுகள் : "+gdead;
+		var tdead=calctiger();
+		document.getElementById('tigerdead').innerText="அடக்கப்பட்ட புலிகள் : : "+tdead;
+		if(tdead==3)
+		{
+			ele.innerText="ஆடு வெற்றி....!!";
+			ele.style.color='purple';
+		}
+		else if(gdead>=5)
+		{
+			ele.innerText="புலி வெற்றி....!!";
+			ele.style.color='purple';
+		}
+
+	}
+
+	function nearestPoint(x,y)
+    {
+    	//document.getElementById('checkOut').innerText=pts.length+1;
+    	var i=0,MinD=10000.0,rpi=0;
+    	//document.getElementById('checkOut').innerText=pts.length+2;
+    	for(i=0;i<pts.length;i++)
+    	{
+    		let p=pts[i];
+    		//document.getElementById('checkOut').innerText=i;
+    		let d=Math.sqrt(Math.pow(p[0]-x,2)+Math.pow(p[1]-y,2));
+    		if(d<MinD)
+    		{
+    			MinD=d;
+    			rpi=i;
+    		}
+    	}
+    //	document.getElementById('checkOut').innerText="s"+MinD.toString();
+    	return rpi;
+    }
+	var tiger,goat;
+	tiger=new Image();
+    goat=new Image();
+    tiger.src="TigerFace.png";
+    goat.src="goatFace.jfif";
+	var current=0;
+	
+	canvas.addEventListener('mousedown', function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    var rpi=nearestPoint(x,y);
+    var p=pts[rpi];
+    //document.getElementById('checkOut').innerText="hi threr "+x+" - "+y+" "+pts.length;
+    //drawTiger(p[0],p[1]);
+    if( !remaining[player]){
+    if(alloc[rpi])
+    {
+    	selected=rpi;
+
+    }
+    else
+    {
+    	if(selected>=0)
+    	{
+    		if(Validate(player,rpi,selected))
+    			{player^=1;
+document.getElementById('checkOut').innerText="";
+    			}
+    		else
+    		{
+    			//display error
+    	document.getElementById('checkOut').innerText="தவறானது";
+    		}
+    	selected=-1;
+    	}
+
+    }
+	}
+	else
+	{
+		if(alloc[rpi]==0)
+		{
+			//document.getElementById('checkOut').innerText="inner4";
+			alloc[rpi]=player+1;
+			remaining[player]--;
+			player^=1;
+			document.getElementById('checkOut').innerText="";
+			
+		}
+
+	}
+	refresh();
+});
+	canvas.addEventListener('mouseup',function(event) {
+if(selected>=0)
+{
+		const rect = canvas.getBoundingClientRect();
+	    const x = event.clientX - rect.left;
+	    const y = event.clientY - rect.top;
+	    var rpi=nearestPoint(x,y);
+	    if(alloc[rpi])
+	    	return;
+	    var p=pts[rpi];
+	    
+    	
+    		if(Validate(player,rpi,selected))
+    			{player^=1;
+document.getElementById('checkOut').innerText="";
+    			}
+    		else
+    		{
+    			
+    			//display error
+    	document.getElementById('checkOut').innerText="தவறானது";
+    		}
+    	selected=-1;
+refresh();
+}
+	});
+
+	function draw() {
+        if (canvas.getContext) {
+            //var ctx = canvas.getContext('2d');
+            ctx.lineWidth=5;
+            var sWidth = canvas.width;
+            var sHeight = canvas.height;
+            ctx.moveTo(sWidth/2,40);
+            ctx.lineTo(40,sHeight-40);
+            ctx.lineTo(40,sHeight-40);
+            ctx.lineTo(sWidth-40,sHeight-40);
+            ctx.lineTo(sWidth/2,40);
+            ctx.lineTo((sWidth-80)/3+40,sHeight-40);
+            ctx.moveTo(sWidth/2,40);
+            ctx.lineTo(2*(sWidth-80)/3+40,sHeight-40);
+            ctx.moveTo(sWidth/6,sHeight/3);
+            ctx.lineTo(5*sWidth/6,sHeight/3);
+            ctx.moveTo(sWidth/12+20,sHeight/2);
+            ctx.lineTo(11*sWidth/12-20,sHeight/2);
+            ctx.moveTo(40,2*sHeight/3);
+            ctx.lineTo(sWidth-40,2*sHeight/3);
+
+            ctx.moveTo(sWidth/6,sHeight/3);
+            ctx.lineTo(40,2*sHeight/3);
+            ctx.moveTo(5*sWidth/6,sHeight/3);
+            ctx.lineTo(sWidth-40,2*sHeight/3);
+            ctx.stroke();
+        }
+    };
+   
+    function getPoints(){
+    	  var sWidth = canvas.width;
+           var sHeight = canvas.height;
+    	pts=[
+		    	[ sWidth/2 , 40 ],
+				[ 40 , sHeight-40 ],
+				[ sWidth-40 , sHeight-40 ],
+				[ (sWidth-80)/3+40 , sHeight-40 ],
+				[ 2*(sWidth-80)/3+40 , sHeight-40 ],
+				[ sWidth/6 , sHeight/3 ],
+				[ 5*sWidth/6 , sHeight/3 ],
+				[ sWidth/12+20 , sHeight/2 ],
+				[ 11*sWidth/12-20 , sHeight/2 ],
+				[ 40 , 2*sHeight/3 ],
+				[ sWidth-40 , 2*sHeight/3 ]
+			];
+	function fx(P,Q,R,S){
+    	var x1=pts[P][0],x2=pts[Q][0],x3=pts[R][0],x4=pts[S][0];
+    	var y1=pts[P][1],y2=pts[Q][1],y3=pts[R][1],y4=pts[S][1];
+		var x12 = x1 - x2;
+ 		var  x34 = x3 - x4;
+   		var y12 = y1 - y2;
+  		var y34 = y3 - y4;
+    var c = x12 * y34 - y12 * x34;
+    var a = x1 * y2 - y1 * x2;
+   var b = x3 * y4 - y3 * x4;
+     var  x = (a * x34 - b * x12) / c;
+       var y = (a * y34 - b * y12) / c;
+      return [x , y];
+};
+		pts=pts.concat(
+		[
+			fx(0,1,5,6),
+			fx(0,2,5,6),
+			fx(0,3,5,6),
+			fx(0,4,5,6),
+			fx(0,1,7,8),
+			fx(0,2,7,8),
+			fx(0,3,7,8),
+			fx(0,4,7,8),
+			fx(0,1,9,10),
+			fx(0,2,9,10),
+			fx(0,3,9,10),
+			fx(0,4,9,10)
+		]);
+		 //document.getElementById('checkOut').innerText=pts.length;
+    }
+    function drawTiger(x,y,current) {
+    	  if(current!=1)
+    	  	ctx.drawImage(goat, x-40, y-40, 80, 80);
+    	  else
+    	  	ctx.drawImage(tiger, x-40, y-40, 80, 80);
+    };
+
+window.onload = function()
+{
+	getPoints(); refresh();
+}
+initAll();
+</script>
+</body>
+</html>
