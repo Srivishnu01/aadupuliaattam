@@ -32,7 +32,7 @@
 <body style="background-color: #9c7">
 
 <h1><center >
-நிரல்களம்'21 :: ஆடு-புலி ஆட்டம் by TEAM THANDRAS
+நிரல்களம்'21 :: ஆடு-புலி ஆட்டம்  by TEAM THANDRAS
 </center></h1>
 
 <div class="row">
@@ -56,9 +56,9 @@
     	</h4>
     	</p>
     	__________________________________________<br>
-    	<p id='gameturn'>ஆடு விளையாடுக</p>
-    	__________________________________________<br><br>
-    	<button id="newgame">புதிய விளையாட்டு</button>
+    	<h2><p id='gameturn'>ஆடு விளையாடுக</p>
+    	__________________________________________
+    	<button id="newgame">புதிய விளையாட்டு</button></h2>
 <p id='checkOut' style="color: red"></p>
 </center>
     </h3>
@@ -82,7 +82,7 @@ style="border:0px solid #000000;">
 	var canvas = document.getElementById('gameBoard');
 	document.getElementById('newgame').onclick=initAll;
 	var ctx = canvas.getContext('2d');
-	var pts,alloc,selected=-1,remaining=[3,15],player=0,gdead=0;
+	var pts,alloc,selected=-1,remaining=[3,15],player=0,gdead=0,tdead=0;
 	const nears=[
 	[11,13,14,12],
 	[19,3],
@@ -137,11 +137,52 @@ style="border:0px solid #000000;">
 	function initAll() {
 		
 		alloc=new Array(23).fill(0);
-		selected=-1,remaining=[3,15],player^=1,gdead=0;
+		selected=-1,remaining=[3,15],player^=1,gdead=0,tdead=0;
 		refresh();
+		drefresh();
 	//	document.getElementById('checkOut').innerText=alloc.toString();
 	}
-	function Validate(player,dest,sour)
+	function canGoatMove(al)
+	{
+		for(nr of nears[al])
+				{
+					if(alloc[nr]==0)
+					{
+						return 0;
+					}
+				}
+		return 1;
+	}
+function canTigerMove(al)
+{
+			//if(alloc[al]==1)
+
+				var conti=false;
+				if(!canGoatMove(al))return 0;
+				for(cr of captures[al])
+				{
+					if(alloc[cr]==0)
+					{
+						for(x of nears[cr])
+					{
+					  for(y of nears[al])
+					  {
+					  	if(x==y && x && alloc[x]==2)
+					  	{
+					  		return 0;
+				
+					  	}
+						
+						}
+			}
+		}
+	}
+	return 1;
+
+}
+
+
+	function Validate(player,dest,sour,perform)
 	{
 		if(alloc[dest])
 			return 0;
@@ -165,13 +206,16 @@ style="border:0px solid #000000;">
 			  	{
 			  		if(alloc[x]!=2)
 			  			return 0;
+			  		if(perform){
 	//		  document.getElementById('checkOut').innerText="inside9-";
 			  		//capture logic
 			  		alloc[x]=0;
 			  		gdead++;
+			  		gdaudio.play();
 	//		document.getElementById('checkOut').innerText+=x;
 			  		alloc[sour]=0;
 			  		alloc[dest]=1;
+			  	}
 			  		return 1;
 			  	}
 			  }
@@ -180,52 +224,23 @@ style="border:0px solid #000000;">
 		}
 		
 		//move logic
+		if(perform){
+			(player?giaudio:tiaudio).play();
 		alloc[sour]=0;
 		alloc[dest]=player+1;
+	}
 			return 1;
 		
 	}
+
 	function calctiger()
 	{
-		var al=0,tdead=0;
+		var al=0,tdead3=0;
 		for(;al<23;al++)
 		{
-			if(alloc[al]==1)
-			{
-				var conti=false;
-				for(nr of nears[al])
-				{
-					if(alloc[nr]==0)
-					{
-						conti=true;
-						break;
-					}
-				}
-				if(conti)continue;
-				for(cr of captures[al])
-				{
-					if(alloc[cr]==0)
-					{
-						for(x of nears[cr])
-					{
-					  for(y of nears[al])
-					  {
-					  	if(x==y && x && alloc[x]==2)
-					  	{
-					  		conti=true;
-					  		break;
-					  	}
-						
-						}if(conti)break;
-			}if(conti)break;
-		}
-	}if(conti)continue;
-	tdead++;
-}	
-
-
-}
-	return tdead;
+	 if(alloc[al]==1&&canTigerMove(al))tdead3++;
+		}	
+	return tdead3;
 }
 	function refresh()
 	{
@@ -240,28 +255,10 @@ style="border:0px solid #000000;">
 			{
 				let p=pts[i];
 //	document.getElementById('checkOut').innerText+=(jc++);
-				drawTiger(p[0],p[1],alloc[i]);
+				drawImage(p[0],p[1],alloc[i]);
 			}
 		}
 		//document.getElementById('checkOut').innerText="";
-		document.getElementById('tigercount').innerText="புலிகள் மீதி : "+remaining[0];
-		document.getElementById('goatcount').innerText="ஆடுகள் மீதி : "+remaining[1];
-		var ele=document.getElementById('gameturn');
-		ele.innerText=player?'ஆடு விளையாடுக':'புலி விளையாடுக';
-		ele.style.color=player?'blue':'green';
-		document.getElementById('goatdead').innerText="கொல்லப்பட்ட ஆடுகள் : "+gdead;
-		var tdead=calctiger();
-		document.getElementById('tigerdead').innerText="அடக்கப்பட்ட புலிகள் : : "+tdead;
-		if(tdead==3)
-		{
-			ele.innerText="ஆடு வெற்றி....!!";
-			ele.style.color='purple';
-		}
-		else if(gdead>=5)
-		{
-			ele.innerText="புலி வெற்றி....!!";
-			ele.style.color='purple';
-		}
 
 	}
 
@@ -284,33 +281,116 @@ style="border:0px solid #000000;">
     //	document.getElementById('checkOut').innerText="s"+MinD.toString();
     	return rpi;
     }
-	var tiger,goat;
+    		var ele=document.getElementById('gameturn');
+	var tiger,goat,One=0, 
+	gdaudio=new Audio('Goat-Short-Cry.mp3'),
+	giaudio=new Audio('Goat-Short-Far-Away.mp3'),
+	gwaudio=new Audio('Goats-Multiple-In-Distance.mp3'),
+	tdaudio=new Audio('Tiger.wav'),
+	tiaudio=new Audio('TIGER_R2.wav'),
+	twaudio=new Audio('tiigri_urin.wav');
 	tiger=new Image();
     goat=new Image();
-    tiger.src="TigerFace.png";
-    goat.src="goatFace.jfif";
+    ximg=new Image();
+    xgimg=new Image();
+    tiger.src="tv2.png";
+    goat.src="gv2.png";
+    ximg.src="xv2.png";
+    xgimg.src="xvg.png";
 	var current=0;
-	
+
+function drefresh()	
+{
+document.getElementById('tigercount').innerText="புலிகள் மீதி : "+remaining[0];
+		document.getElementById('goatcount').innerText="ஆடுகள் மீதி : "+remaining[1];
+		ele.innerText=player?'ஆடு விளையாடுக':'புலி விளையாடுக';
+		ele.style.color=player?'blue':'green';
+		document.getElementById('goatdead').innerText="கொல்லப்பட்ட ஆடுகள் : "+gdead;
+		var tdead2=calctiger();
+		if(tdead2>tdead)
+		{
+			tdaudio.play();
+		}
+		tdead=tdead2;
+		document.getElementById('tigerdead').innerText="அடக்கப்பட்ட புலிகள் : : "+tdead;
+		if(tdead==3)
+		{
+			ele.innerText="ஆடு வெற்றி....!!";
+			ele.style.color='purple';
+			gwaudio.play();
+		}
+		else if(gdead>=5)
+		{
+			ele.innerText="புலி வெற்றி....!!";
+			ele.style.color='purple';
+			twaudio.play();
+		}}
+
+	canvas.addEventListener('mousemove',function(event){
+		if(selected==-1)
+		{
+		    const rect = canvas.getBoundingClientRect();
+		    const x = event.clientX - rect.left;
+		    const y = event.clientY - rect.top;
+		    var rpi=nearestPoint(x,y);		
+
+		    One=!((!player && alloc[rpi]==1 && !canTigerMove(rpi) && !remaining[0]) 
+		    || (player && alloc[rpi]==2 && !canGoatMove(rpi) && !remaining[1]) 
+		    || (alloc[rpi]==0 && remaining[player]));
+		    var p= pts[rpi];
+		    drawImage(p[0],p[1],3+One);
+		    refresh();
+		    drawImage(p[0],p[1],3+One);
+		}
+			ele.style.color='#'+ Math.random().toString(16).substr(-6);
+
+	});
+
 	canvas.addEventListener('mousedown', function(event) {
+
+
+		/*if(One)
+		{
+					//display error
+    	document.getElementById('checkOut').innerText="தவறானது";
+    	return;
+		}*/
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     var rpi=nearestPoint(x,y);
     var p=pts[rpi];
     //document.getElementById('checkOut').innerText="hi threr "+x+" - "+y+" "+pts.length;
-    //drawTiger(p[0],p[1]);
+    //drawImage(p[0],p[1]);
     if( !remaining[player]){
     if(alloc[rpi])
     {
     	selected=rpi;
+    	refresh();
+    	//var i=0;
+    	//document.getElementById('tigerdead').innerText=nears[rpi]+captures[rpi];
+    	for(nr of nears[rpi].concat(captures[rpi]))
+    	{
+    		//i++;
+    		//document.getElementById('tigerdead').innerText="hi";
+    		if(Validate(player,nr,rpi,false))
+    		{
+    			let p=pts[nr];
+    			drawImage(p[0],p[1],5);
+    		}
 
+    	}
+    	
     }
     else
     {
     	if(selected>=0)
     	{
-    		if(Validate(player,rpi,selected))
-    			{player^=1;
+    		if(Validate(player,rpi,selected,true))
+    			{
+
+
+    				player^=1;
 document.getElementById('checkOut').innerText="";
     			}
     		else
@@ -328,6 +408,7 @@ document.getElementById('checkOut').innerText="";
 		if(alloc[rpi]==0)
 		{
 			//document.getElementById('checkOut').innerText="inner4";
+			(player?giaudio:tiaudio).play();
 			alloc[rpi]=player+1;
 			remaining[player]--;
 			player^=1;
@@ -336,9 +417,16 @@ document.getElementById('checkOut').innerText="";
 		}
 
 	}
-	refresh();
+	//refresh();
 });
 	canvas.addEventListener('mouseup',function(event) {
+
+		/*if(One)
+		{
+					//display error
+    	document.getElementById('checkOut').innerText="தவறானது";
+    	return;
+		}*/
 if(selected>=0)
 {
 		const rect = canvas.getBoundingClientRect();
@@ -350,7 +438,7 @@ if(selected>=0)
 	    var p=pts[rpi];
 	    
     	
-    		if(Validate(player,rpi,selected))
+    		if(Validate(player,rpi,selected,true))
     			{player^=1;
 document.getElementById('checkOut').innerText="";
     			}
@@ -361,8 +449,10 @@ document.getElementById('checkOut').innerText="";
     	document.getElementById('checkOut').innerText="தவறானது";
     		}
     	selected=-1;
-refresh();
 }
+refresh();
+drefresh();
+		
 	});
 
 	function draw() {
@@ -441,16 +531,32 @@ refresh();
 		]);
 		 //document.getElementById('checkOut').innerText=pts.length;
     }
-    function drawTiger(x,y,current) {
-    	  if(current!=1)
-    	  	ctx.drawImage(goat, x-40, y-40, 80, 80);
-    	  else
-    	  	ctx.drawImage(tiger, x-40, y-40, 80, 80);
+    function drawImage(x,y,current) {
+    	var img,mXY=80,cXY=40;
+    	switch(current)
+    	{
+    		case 1:
+    		img=tiger;
+    		break;
+    		case 2:
+    		img=goat;break;
+    		case 5:
+    		mXY=60;cXY=30;
+    		case 3:
+    		img=xgimg;
+    		//mXY=40;cXY=20;
+    		break;
+    		case 4:
+    		img=ximg;break;
+    		default:
+    		return;
+    	}
+    	ctx.drawImage(img, x-cXY, y-cXY, mXY, mXY);
     };
 
 window.onload = function()
 {
-	getPoints(); refresh();
+	getPoints(); initAll();
 }
 initAll();
 </script>
