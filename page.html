@@ -53,19 +53,21 @@
     	</p>
     	<p><h4><b>______________________________________</b><br>5 ஆடுகள் கொல்லப்பட்டால் புலி வெற்றி**<br>
     		3 புலியையும் அடக்கினால் ஆடு வெற்றி**
+    		 <a href="kurippu.html" target="_blank">ஆட்ட விதிமுறைகள்</a>
     	</h4>
-    	</p>
-    	__________________________________________<br>
-    	<h2><p id='gameturn'>ஆடு விளையாடுக</p>
+    	</p><h1>
     	__________________________________________
-    	<button id="newgame">புதிய விளையாட்டு</button></h2>
+    	<p id='gameturn'>ஆடு ஆடுக</p>
+    	
+    	<button id="newgame">புதிய விளையாட்டு</button></h1>
+
 <p id='checkOut' style="color: red"></p>
 </center>
     </h3>
 
    
   </div>
-  <div class="column right" style="background-color:#b3ffe0;">
+  <div class="column right" style="background-color:#bfcaff;">
    
     <p></p>
 <center>
@@ -138,6 +140,7 @@ style="border:0px solid #000000;">
 		
 		alloc=new Array(23).fill(0);
 		selected=-1,remaining=[3,15],player^=1,gdead=0,tdead=0;
+		gameEnded=false;
 		refresh();
 		drefresh();
 	//	document.getElementById('checkOut').innerText=alloc.toString();
@@ -282,28 +285,32 @@ function canTigerMove(al)
     	return rpi;
     }
     		var ele=document.getElementById('gameturn');
-	var tiger,goat,One=0, 
+	var tiger,goat,One=0,gameEnded=false, 
 	gdaudio=new Audio('Goat-Short-Cry.mp3'),
 	giaudio=new Audio('Goat-Short-Far-Away.mp3'),
 	gwaudio=new Audio('Goats-Multiple-In-Distance.mp3'),
 	tdaudio=new Audio('Tiger.wav'),
 	tiaudio=new Audio('TIGER_R2.wav'),
 	twaudio=new Audio('tiigri_urin.wav');
+	applause=new Audio('applause2.mp3');
 	tiger=new Image();
     goat=new Image();
+    crown=new Image();
     ximg=new Image();
     xgimg=new Image();
+    tlife=new Image();
+    tlife.src="thuglife.png";
     tiger.src="tv2.png";
     goat.src="gv2.png";
     ximg.src="xv2.png";
     xgimg.src="xvg.png";
-	var current=0;
+    crown.src="crown1.png";
 
 function drefresh()	
 {
 document.getElementById('tigercount').innerText="புலிகள் மீதி : "+remaining[0];
 		document.getElementById('goatcount').innerText="ஆடுகள் மீதி : "+remaining[1];
-		ele.innerText=player?'ஆடு விளையாடுக':'புலி விளையாடுக';
+		ele.innerText=player?'ஆடு ஆடுக':'புலி ஆடுக';
 		ele.style.color=player?'blue':'green';
 		document.getElementById('goatdead').innerText="கொல்லப்பட்ட ஆடுகள் : "+gdead;
 		var tdead2=calctiger();
@@ -315,18 +322,23 @@ document.getElementById('tigercount').innerText="புலிகள் மீத
 		document.getElementById('tigerdead').innerText="அடக்கப்பட்ட புலிகள் : : "+tdead;
 		if(tdead==3)
 		{
+			gameEnded=true;
 			ele.innerText="ஆடு வெற்றி....!!";
 			ele.style.color='purple';
+			applause.play();
 			gwaudio.play();
 		}
 		else if(gdead>=5)
 		{
+			gameEnded=true;
 			ele.innerText="புலி வெற்றி....!!";
 			ele.style.color='purple';
+			applause.play();
 			twaudio.play();
 		}}
 
 	canvas.addEventListener('mousemove',function(event){
+		if(gameEnded)return;
 		if(selected==-1)
 		{
 		    const rect = canvas.getBoundingClientRect();
@@ -355,6 +367,7 @@ document.getElementById('tigercount').innerText="புலிகள் மீத
     	document.getElementById('checkOut').innerText="தவறானது";
     	return;
 		}*/
+		if(gameEnded)return;
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -427,6 +440,7 @@ document.getElementById('checkOut').innerText="";
     	document.getElementById('checkOut').innerText="தவறானது";
     	return;
 		}*/
+		if(gameEnded)return;
 if(selected>=0)
 {
 		const rect = canvas.getBoundingClientRect();
@@ -532,14 +546,17 @@ drefresh();
 		 //document.getElementById('checkOut').innerText=pts.length;
     }
     function drawImage(x,y,current) {
-    	var img,mXY=80,cXY=40;
+    	var img,mXY=80,cXY=40,isCrown=false;
     	switch(current)
     	{
     		case 1:
     		img=tiger;
+    		isCrown=gdead>=5;
     		break;
     		case 2:
-    		img=goat;break;
+    		img=goat;
+    		isCrown=tdead==3;
+    		break;
     		case 5:
     		mXY=60;cXY=30;
     		case 3:
@@ -552,6 +569,10 @@ drefresh();
     		return;
     	}
     	ctx.drawImage(img, x-cXY, y-cXY, mXY, mXY);
+    	if(current>2 || !isCrown)return;
+
+    	ctx.drawImage(tlife, x-65, y, 120, 80);
+    	ctx.drawImage(crown, x-65, y-95, 120, 80);
     };
 
 window.onload = function()
