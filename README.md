@@ -3,7 +3,7 @@ Niralkalam'21 Tamil mandram international level hackathon 2021 by GCT, covai....
 
 HOW TO RUN:
 1. CLONE THE REPO OR DOWNLOAD REPO AS .ZIP FILE
-2. OPEN page.html FILE
+2. OPEN index.html FILE
 3. PLAY THE GAME AS INSTRUCTED
 
 
