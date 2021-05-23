@@ -2,9 +2,8 @@
 Niralkalam'21 Tamil mandram international level hackathon 2021 by GCT, covai......Topic: Online game for tamil Marabu thinnai vilaiyattu..(Aadu puli aattam)
 
 HOW TO RUN:
-1. CLONE THE REPO OR DOWNLOAD REPO AS .ZIP FILE
-2. OPEN index.html FILE
-3. PLAY THE GAME AS INSTRUCTED
+1. http://aadupuliaattam.000webhostapp.com/?id=8103829107391
+2. Open this link and change id Param with your open choice
 
 
 ஆட்ட விதிமுறைகள் 
