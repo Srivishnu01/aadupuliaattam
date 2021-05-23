@@ -1,10 +1,16 @@
 # aadupuliaattam
-Niralkalam'21 Tamil mandram international level hackathon 2021 by GCT, covai......Topic: Online game for tamil Marabu thinnai vilaiyattu..(Aadu puli aattam)
+Niralkalam'21 Tamil mandram international level hackathon 2021 by international forum for information technology in Tamil INFITT and GCT, covai.....
+Topic: Tamil arts : developing Online version of tamil home traditional games 
+(தமிழ் மரபு திண்ணை விளையாட்டு..(ஆடு புலி ஆட்டம்)
+
+Kudos, this project won SECOND PRIZE
+https://drive.google.com/file/d/14cAauQqqY3q20fNR9yk0VC-WyYWa_l9r/view?usp=drivesdk
+As the event was just 3 days hackathon, Advance apology that my code is not so perfect and can be further improvisable.
 
 HOW TO RUN:
 1. http://aadupuliaattam.000webhostapp.com/?id=8103829107391
-2. Open this link and change id Param with your open choice
-
+2. Open this link and change id Param with your open choice (any integer)
+3. Share the link with your id to your friends device and play online anytime anywhere with saved (paused) mode
 
 ஆட்ட விதிமுறைகள் 
 
